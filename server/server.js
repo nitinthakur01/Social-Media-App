@@ -2,8 +2,11 @@ import express, { urlencoded } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./utils/database.js";
+import userRoute from "./routes/user-routes.js";
 
 const app = express();
+
+const PORT = 8000;
 
 app.use(express.json());
 app.use(cookieParser());
@@ -14,7 +17,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-const PORT = 8000;
+app.use("/api/v1/user", userRoute);
 
 app.listen(PORT, () => {
   connectDB();
