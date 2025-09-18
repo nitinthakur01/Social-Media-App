@@ -1,10 +1,10 @@
 import "./App.css";
-import { Button } from "./components/ui/button";
+import SignUp from "./components/SignUp";
 
 function App() {
   return (
     <>
-      <Button>Start</Button>
+      <SignUp />
     </>
   );
 }
