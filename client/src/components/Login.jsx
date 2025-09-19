@@ -7,9 +7,8 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
-function SignUp() {
+function Login() {
   const [input, setInput] = useState({
-    username: "",
     email: "",
     password: "",
   });
@@ -20,14 +19,14 @@ function SignUp() {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  const signupHandler = async (e) => {
+  const loginHandler = async (e) => {
     e.preventDefault();
     console.log(input);
 
     try {
       setLoading(true);
       const response = await axios.post(
-        "http://localhost:8000/api/v1/user/register",
+        "http://localhost:8000/api/v1/user/login",
         input,
         {
           headers: {
@@ -37,10 +36,9 @@ function SignUp() {
         }
       );
       if (response.data.success) {
-        navigate("/login");
+        navigate("/");
         toast.success(response.data.message);
         setInput({
-          username: "",
           email: "",
           password: "",
         });
@@ -55,24 +53,14 @@ function SignUp() {
   return (
     <div className="flex items-center w-screen h-screen justify-center ">
       <form
-        onSubmit={signupHandler}
+        onSubmit={loginHandler}
         className="shadow-lg flex flex-col gap-5 p-8"
       >
         <div className="my-4">
           <h1 className="text-center font-bold text-xl">LOGO</h1>
           <p className="text-sm text-center">
-            Create your account to see photos & videos
+            Login your account to see photos & videos
           </p>
-        </div>
-        <div>
-          <Label className="py-1 font-medium">Username</Label>
-          <Input
-            type="text"
-            name="username"
-            value={input.username}
-            onChange={changeEventHandler}
-            className="focus-visible:ring-transparent my-2"
-          />
         </div>
         <div>
           <Label className="py-1 font-medium">Email</Label>
@@ -101,13 +89,13 @@ function SignUp() {
           </Button>
         ) : (
           <Button type="submit" className="cursor-pointer">
-            Signup
+            Login
           </Button>
         )}
         <span className="text-center">
-          Already have an account?{" "}
-          <Link to="/login" className="text-gray-600">
-            Login
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-gray-600">
+            Signup
           </Link>
         </span>
       </form>
@@ -115,4 +103,4 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default Login;
