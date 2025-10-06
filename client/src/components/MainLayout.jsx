@@ -6,7 +6,9 @@ function MainLayout() {
   return (
     <div>
       <LeftSidebar />
-      <div>{/* <Outlet /> */}</div>
+      <div>
+        <Outlet />
+      </div>
     </div>
   );
 }
