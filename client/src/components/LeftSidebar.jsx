@@ -12,28 +12,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-const sidebarItems = [
-  { icon: <Home />, text: "Home" },
-  { icon: <Search />, text: "Search" },
-  { icon: <TrendingUp />, text: "Explore" },
-  { icon: <MessageCircle />, text: "Messages" },
-  { icon: <Heart />, text: "Notifications" },
-  { icon: <PlusSquare />, text: "Create" },
-  {
-    icon: (
-      <Avatar className="w-6 h-6">
-        <AvatarImage src="https://github.com/shadcn.png" />
-        <AvatarFallback>CN</AvatarFallback>
-      </Avatar>
-    ),
-    text: "Profile",
-  },
-  { icon: <LogOut />, text: "Logout" },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { setAuthUser } from "@/redux/authSlice";
 
 function LeftSidebar() {
   const navigate = useNavigate();
+  const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  console.log(user);
 
   const logoutUser = async () => {
     try {
@@ -41,6 +27,7 @@ function LeftSidebar() {
         withCredentials: true,
       });
       if (res.data.success) {
+        dispatch(setAuthUser(null));
         navigate("/login");
         toast.success(res.data.message);
       }
@@ -52,6 +39,25 @@ function LeftSidebar() {
   const sidebarHandler = (textType) => {
     if (textType === "Logout") logoutUser();
   };
+
+  const sidebarItems = [
+    { icon: <Home />, text: "Home" },
+    { icon: <Search />, text: "Search" },
+    { icon: <TrendingUp />, text: "Explore" },
+    { icon: <MessageCircle />, text: "Messages" },
+    { icon: <Heart />, text: "Notifications" },
+    { icon: <PlusSquare />, text: "Create" },
+    {
+      icon: (
+        <Avatar className="w-6 h-6">
+          <AvatarImage src={user?.profilePicture} />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      ),
+      text: "Profile",
+    },
+    { icon: <LogOut />, text: "Logout" },
+  ];
 
   return (
     <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
