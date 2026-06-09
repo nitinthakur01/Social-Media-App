@@ -22,10 +22,20 @@ export const addNewPost = async (req, res) => {
       .toFormat("jpeg", { quality: 80 })
       .toBuffer();
 
-    const fileUri = `data:image/jpeg;base64, ${optimizedImageBuffer.toString(
-      "base64"
-    )}`;
-    const cloudResponse = await cloudinary.uploader.upload(fileUri);
+    // const fileUri = `data:image/jpeg;base64, ${optimizedImageBuffer.toString(
+    //   "base64",
+    // )}`;
+    // const cloudResponse = await cloudinary.uploader.upload(fileUri);
+
+    // console.log("After Cloudinary upload");
+    const cloudResponse = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream({}, (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        })
+        .end(optimizedImageBuffer);
+    });
 
     const post = await Post.create({
       caption,
@@ -216,7 +226,7 @@ export const getCommentsOfPost = async (req, res) => {
     const postId = req.params.id;
 
     const comments = await Comment.find({ post: postId }).populate(
-      "author, username, profilePicture"
+      "author, username, profilePicture",
     );
 
     if (!comments) {
