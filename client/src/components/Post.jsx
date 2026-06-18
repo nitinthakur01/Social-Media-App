@@ -5,12 +5,17 @@ import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { Button } from "./ui/button";
 import { FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "sonner";
+import { setPosts } from "@/redux/postSlice";
 
 function Post({ post }) {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
+  const { posts } = useSelector((store) => store.post);
+  const dispatch = useDispatch();
 
   const changeEventHandler = (e) => {
     const inputText = e.target.value;
@@ -21,7 +26,24 @@ function Post({ post }) {
     }
   };
 
-  const deletePostHandler = (e) => {};
+  const deletePostHandler = async () => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:8000/api/v1/post/delete/${post?._id}`,
+        { withCredentials: true },
+      );
+      if (res.data.success) {
+        const updatedPostData = posts.filter(
+          (postItem) => postItem?._id !== post?._id,
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.messsage);
+    }
+  };
 
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
@@ -48,7 +70,11 @@ function Post({ post }) {
               Add to favorites
             </Button>
             {user && user?._id === post?.author._id && (
-              <Button variant="ghost" className="cursor-pointer w-fit">
+              <Button
+                variant="ghost"
+                onClick={deletePostHandler}
+                className="cursor-pointer w-fit"
+              >
                 Delete
               </Button>
             )}
