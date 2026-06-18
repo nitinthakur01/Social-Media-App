@@ -57,7 +57,7 @@ function LeftSidebar() {
       icon: (
         <Avatar className="w-6 h-6">
           <AvatarImage src={user?.profilePicture} />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>NT</AvatarFallback>
         </Avatar>
       ),
       text: "Profile",
@@ -68,7 +68,9 @@ function LeftSidebar() {
   return (
     <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
       <div className="flex flex-col">
-        <h1 className="my-8 pl-3 font-bold text-xl">LOGO</h1>
+        <h1 className="my-8 pl-3 text-3xl font-bold italic bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] bg-clip-text text-transparent tracking-tight">
+          Instalite
+        </h1>
         <div>
           {sidebarItems.map((item, index) => {
             return (
