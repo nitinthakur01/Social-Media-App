@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { Button } from "./ui/button";
-import { FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -15,6 +15,8 @@ function Post({ post }) {
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
   const { posts } = useSelector((store) => store.post);
+  const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
+  const [postLike, setPostLike] = useState(post.likes.length);
   const dispatch = useDispatch();
 
   const changeEventHandler = (e) => {
@@ -23,6 +25,38 @@ function Post({ post }) {
       setText(inputText);
     } else {
       setText("");
+    }
+  };
+
+  const likeOrDislikeHandler = async () => {
+    try {
+      const action = liked ? "dislike" : "like";
+      const res = await axios.get(
+        `http://localhost:8000/api/v1/post/${post._id}/${action}`,
+        { withCredentials: true },
+      );
+      if (res.data.success) {
+        const updateLikes = liked ? postLike - 1 : postLike + 1;
+        setPostLike(updateLikes);
+        setLiked(!liked);
+
+        // update our post
+        const updatedPostData = posts.map((p) =>
+          p._id === post._id
+            ? {
+                ...p,
+                likes: liked
+                  ? p.likes.filter((id) => id !== user._id)
+                  : [...p.likes, user._id],
+              }
+            : p,
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.messsage);
     }
   };
 
@@ -89,10 +123,20 @@ function Post({ post }) {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <FaRegHeart
-            size={"22px"}
-            className="cursor-pointer hover:text-gray-600"
-          />
+          {liked ? (
+            <FaHeart
+              onClick={likeOrDislikeHandler}
+              size={"24"}
+              className="cursor-pointer text-red-600"
+            />
+          ) : (
+            <FaRegHeart
+              onClick={likeOrDislikeHandler}
+              size={"22px"}
+              className="cursor-pointer hover:text-gray-600"
+            />
+          )}
+
           <MessageCircle
             onClick={() => setOpen(true)}
             className="cursor-pointer hover:text-gray-600"
@@ -102,7 +146,7 @@ function Post({ post }) {
         <Bookmark className="cursor-pointer hover:text-gray-600" />
       </div>
       <span className="font-medium block mb-2 text-gray-800">
-        {post.likes.length} likes
+        {postLike} likes
       </span>
       <p>
         <span className="font-medium mr-2">{post.author?.username}</span>
