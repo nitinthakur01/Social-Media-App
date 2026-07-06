@@ -17,6 +17,7 @@ function Post({ post }) {
   const { posts } = useSelector((store) => store.post);
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
   const [postLike, setPostLike] = useState(post.likes.length);
+  const [comment, setComment] = useState(post.comments);
   const dispatch = useDispatch();
 
   const changeEventHandler = (e) => {
@@ -56,7 +57,36 @@ function Post({ post }) {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.messsage);
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const commentHandler = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:8000/api/v1/post/${post?._id}/comment`,
+        { text },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        },
+      );
+      if (res.data.success) {
+        const updatedCommentData = [...comment, res.data.comment];
+        setComment(updatedCommentData);
+
+        const updatedPostData = posts.map((p) =>
+          p._id === post._id ? { ...p, comments: updatedCommentData } : p,
+        );
+        dispatch(setPosts(updatedPostData));
+        toast.success(res.data.message);
+        setText("");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -75,7 +105,7 @@ function Post({ post }) {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.messsage);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -156,7 +186,7 @@ function Post({ post }) {
         onClick={() => setOpen(true)}
         className="cursor-pointer text-sm text-gray-400"
       >
-        View all 456 comments
+        View all {comment.length} comments
       </span>
       <CommentDialog open={open} setOpen={setOpen} />
       <div className="flex items-center justify-between">
@@ -167,7 +197,14 @@ function Post({ post }) {
           onChange={changeEventHandler}
           className="outline-none text-sm w-full"
         />
-        {text && <span className="text-[#3BADF8]">Post</span>}
+        {text && (
+          <span
+            onClick={commentHandler}
+            className="text-[#3BADF8] cursor-pointer"
+          >
+            Post
+          </span>
+        )}
       </div>
     </div>
   );
