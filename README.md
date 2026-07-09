@@ -1,2 +1,2 @@
-# MERN-SOCIAL-APP
+# MERN-SOCIAL-MEDIA-APP
 Social media app using mern
