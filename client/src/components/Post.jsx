@@ -8,7 +8,8 @@ import CommentDialog from "./CommentDialog";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "sonner";
-import { setPosts } from "@/redux/postSlice";
+import { setPosts, setSelectedPost } from "@/redux/postSlice";
+import { Badge } from "./ui/badge";
 
 function Post({ post }) {
   const [text, setText] = useState("");
@@ -117,7 +118,12 @@ function Post({ post }) {
             <AvatarImage src={post.author?.profilePicture} alt="post_image" />
             <AvatarFallback>NT</AvatarFallback>
           </Avatar>
-          <h1>{post.author?.username}</h1>
+          <div className="flex items-center gap-3">
+            <h1>{post.author?.username}</h1>
+            {user?._id === post.author._id && (
+              <Badge variant="secondary">Author</Badge>
+            )}
+          </div>
         </div>
         <Dialog>
           <DialogTrigger asChild>
@@ -168,7 +174,10 @@ function Post({ post }) {
           )}
 
           <MessageCircle
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              dispatch(setSelectedPost(post));
+              setOpen(true);
+            }}
             className="cursor-pointer hover:text-gray-600"
           />
           <Send className="cursor-pointer hover:text-gray-600" />
@@ -183,7 +192,10 @@ function Post({ post }) {
         {post.caption}
       </p>
       <span
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          dispatch(setSelectedPost(post));
+          setOpen(true);
+        }}
         className="cursor-pointer text-sm text-gray-400"
       >
         View all {comment.length} comments
